@@ -13,8 +13,4 @@ router.post("/register", controller.add);
 router.delete("/delete/:id", controller.delete);
 router.put("/update/:id", controller.update);
 
-// router.post('/daftar', pendudukController.registrasi);
-// router.get('/login', controller.login);
-// router.get('/logout', controller.logout);
-
 module.exports = router;

@@ -1,6 +1,3 @@
-//what is the difference between a function and a method?
-//A function is a block of code that can be executed. A method is a function that is part of an object.
-
 //initiate server
 const express = require('express');
 //implement
@@ -32,6 +29,9 @@ app.use ("/user", require('./routes/user.router'));
 // app.use ("/paket", require('./routes/paket.router'));
 // app.use ("/transaksi", require('./routes/transaksi.router'));
 // app.use ("/detil_transaksi", require('./routes/detil_laundry.router'));
+
+app.use ("/login", require('./routes/authentication.router'));
+
 
 const port = 8080;
 app.listen(port, () => console.log (`Server port = ${port}`))
