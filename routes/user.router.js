@@ -2,7 +2,6 @@ const express = require("express");
 const router =  new express.Router();
 const controller = require('../controllers/user.controller');
 
-
 // const {checkToken} = require('../auth/auth_validation');
 
 

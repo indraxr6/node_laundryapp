@@ -1,12 +1,18 @@
-// const express = require("express");
-// const router =  new express.Router();
-// const controller = require('../controllers/pelanggan.controller');
-// const auth = require('../auth/validation')
+const express = require("express");
+const router =  new express.Router();
+const controller = require('../controllers/transaksi.controller');
 
-// router.get("/", auth.checkToken, controller.displayAllData);
-// router.get("/:id", auth.checkToken, controller.displayData);
-// router.post("/", auth.checkToken, controller.add);
-// router.delete("/", auth.checkToken, controller.delete);
-// router.put("/", auth.checkToken, controller.update);
+// const {checkToken} = require('../auth/auth_validation');
 
-// module.exports = router;
+router.get("/detail/", controller.getData);
+router.get("/detail/:id", controller.getDetails);
+
+
+// router.get("/:id", controller.selectData);
+
+
+router.post("/add", controller.add);
+router.delete("/delete/:id", controller.delete);
+router.put("/update/:id", controller.update);
+
+module.exports = router;

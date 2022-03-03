@@ -26,9 +26,9 @@ module.exports = {
         })
     },
     selectData: (req,res) => {
-        let id_user = req.params.id_user;
+        let id = req.params.id;
         let sql = "select * from user where id = ?";
-        db.query(sql, id_user, (err,result) => {
+        db.query(sql, id, (err,result) => {
             if(err){
                 throw err;
             }else{

@@ -1,20 +1,11 @@
 'use strict'
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const secret = '#@$%^&*()_+';
 const db = require("../db");
-const md5 = require("md5");
-
-function hashPassword(password) {
-    const salt = bcrypt.genSaltSync(10);
-    return bcrypt.hashSync(password, salt);
-}
 
 //GET endpoints
 
 module.exports = {
     getData: (req,res) => {
-        let sql = "select * from user";
+        let sql = "select * from member";
         db.query(sql, (err,result) => {
             if(err){
                 throw err;
@@ -26,9 +17,9 @@ module.exports = {
         })
     },
     selectData: (req,res) => {
-        let id_user = req.params.id_user;
-        let sql = "select * from user where id = ?";
-        db.query(sql, id_user, (err,result) => {
+        let id_member = req.params.id_member;
+        let sql = 'select * from member where id = ?';
+        db.query(sql, id_member, (err,result) => {
             if(err){
                 throw err;
             }else{
@@ -48,13 +39,13 @@ module.exports = {
     //CRUD data
 
     add: (req,res) => {
-        const { nama, username, password, tlp,  id_role, id_outlet } = req.body;
-        if(!nama || !username || !password || !tlp || !id_role || !id_outlet) {
+        const { nama, alamat, jenis_kelamin, tlp } = req.body;
+        if(!nama || !alamat || !jenis_kelamin || !tlp ) {
             res.status(402).json({
                 message: "Please fill all the required fields."
             })
         }else{
-            return db.query('insert into user set ?', { nama, username, password: hashPassword(password), tlp, id_role, id_outlet}, (err, result) => {
+            return db.query('insert into member set ?', { nama, alamat, jenis_kelamin, tlp }, (err, result) => {
                 if(err){
                     return res.status(500).json({err})
                 }else{
@@ -68,7 +59,7 @@ module.exports = {
     },
     delete: (req,res) => {
         let id = req.params.id;
-        let sql = "delete from user where id = ?";
+        let sql = "delete from member where id = ?";
         db.query(sql,id, (err,result) => {
             if(err){
                 throw err;
@@ -83,13 +74,12 @@ module.exports = {
         let id = req.params.id;
         let data = {
             nama: req.body.nama,
-            username: req.body.username,
-            password: hashPassword(req.body.password),
+            alamat: req.body.alamat,
+            jenis_kelamin: req.body.jenis_kelamin,
             tlp: req.body.tlp,
-            id_role: req.body.id_role,
-            id_outlet: req.body.id_outlet
+          
         }
-        let sql = "update user set ? where id = ?";
+        let sql = "update membe set ? where id = ?";
         db.query(sql,[data, id], (err,result) => {
             if(err){
                 throw err;

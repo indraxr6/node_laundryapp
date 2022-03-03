@@ -1,168 +1,163 @@
-'use strict'
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const secret = '#@$%^&*()_+';
-const db = require('../db');
-
-function hashPassword(password) {
-  const salt = bcrypt.genSaltSync(10);
-  return bcrypt.hashSync(password, salt);
-}
-
-//LOGIN & REGISTER
+const db = require("../db");
 
 module.exports = {
-  registrasi: (req, res) => {
-    const { nama, username, password, tlp, role } = req.body;
-    if (!nama, !username, !tlp, !role || !password) res.status(402).json({message : 'Input data belum lengkap'});
-
-    return db.query('insert into node_laundry set?', { nama, username, tlp, role, password: hashPassword(password) }, (err, result) => {
-              if (err) return res.status(500).json({err});
-
-              return res.json({message: 'Berhasil mendaftar'});
-
-    })
-},
-
-login: (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(402).json({message: 'Data tidak lengkap'});
-
-    return db.query('select * from node_laundry where email = ?', [email], (err, result) => {
-              if (err) return res.status(500).json({err});
-
-              const user = result[0];
-              if (typeof user === 'undefined') return res.status(401).json({message: 'Email tidak terdaftar'});
-              if (!bcrypt.compareSync(password, user.password)) return res.status(401).json({message: 'Kredensial salah'});
-
-              const token = jwt.sign({ data: user }, secret);
-              return res.json({ message: 'Berhasil login, akses token = ', token });
-             
-    })
-},
-
-//CRUD DATA
-
-          index: (req, res) => {
-                    const  sql = "SELECT * FROM node_laundry";
-                    db.query(sql, (err, result) => {
-                              if (err) throw err
-                              res.json({
-                                        message: 'get all data',
-                                        data: result
-                              })
+    getData: (req,res) => {
+        let sql = "select transaksi.*, member.nama from transaksi inner join member on member.id = transaksi.id_member";
+        db.query(sql, (err,result) => {
+            if(err){
+                throw err;
+            }else{  
+                res.json({
+                    data: result
+                })
+            }
+        })
+    }, 
+    
+    getDetails: (req,res) => {
+        let id = req.params.id;
+        let sql = "select transaksi.*, detil_transaksi.*, member.nama, transaksi.id from transaksi inner join member on member.id = transaksi.id_member inner join detil_transaksi on detil_transaksi.id where transaksi.id = ?";
+        db.query(sql,id, (err,result) => {
+            if(err){
+                throw err;
+            }else{
+                if(result[0]){
+                    res.json({
+                        data: result[0]
                     })
-
-          },
-          add: (req, res) => {
-                    let data = {
-                            nama: req.body.name,
-                            username: req.body.address,
-                            password: req.body.nik,
-                            tlp: req.body.nik,
-                            role: req.body.nik,
-                    }
-                    let sql = "INSERT INTO node_laundry SET ?";
-                    if(data.name && data.address && data.nik){
-                              db.query(sql, data, (err, result) => {
-                                        if (err) throw err
-                                        res.json({
-                                                  message: 'success add data',
-                                                  data: result
-                                        })
-                              })
-                    }
-
-          },
-          delete: (req, res) => {
-                    let id  = req.body.id;
-                    let data;
-                    if(id){
-                              let sql = "SELECT * FROM data_penduduk WHERE id = ?";
-                              db.query(sql, id, (err, result) => {
-                                        if (err) {
-                                                  throw err 
-                                        }else{
-                                                  data = result;
-                                        }
+                }else{
+                    res.json({
+                        message: "Data not found."
                     })
-          }
-          if(id){
-                    let sql = "DELETE FROM data_penduduk WHERE id = ?";
-                    db.query(sql, id, (err) => {
-                              if (err) {
-                                        throw err
-                              }else {
-                                        res.json({
-                                                  message: `success delete data, ID =  ${id}.`,
-                                                  data : data[0]
-                                        })
-                              }
+                }
+            }
+        })        
+    },
+
+    //CRUD DATA
+
+    add: (req,res) => { 
+    let date = new Date();
+        let y = date.getFullYear();
+        let m = ("0" + (date.getMonth() + 1)).slice(-2);
+        let d = ("0" + date.getDate()).slice(-2);
+        let tgl = `${y}-${m}-${d}`;
+    
+    const datelimit = new Date();
+        datelimit.setDate(datelimit.getDate() + 3);
+        let y2 = datelimit.getFullYear();
+        let m2 = ("0" + (datelimit.getMonth() + 1)).slice(-2);
+        let d2 = ("0" + datelimit.getDate()).slice(-2);
+        let batas_waktu = `${y2}-${m2}-${d2}`;
+    
+                let total = req.body.qty * harga 
+                let transaksi = {
+                    id_member: req.body.id_member,
+                    tgl: date,
+                    batas_waktu: batas_waktu,
+                    // tgl_bayar: req.body.tgl_pembayaran,
+                    status: "baru",
+                    dibayar: "belum_bayar",
+                    id_user: req.body.id_user,
+                    id_outlet: req.body.id_outlet,
+                    total: total
+        
+                }
+            }
+        })
+        let insert_transaksi = "select * from paket where id = ?";
+        db.query(insert_transaksi, transaksi, (err,result) => { 
+            if(err){
+                throw err;
+            }else{
+                let sql_paket = "select * from paket where id = ?";
+                db.query(sql_paket, transaksi, (err,result) => {
+                    if(err){
+                        throw err;
+                    }else {
+                        let detil_transaksi = {
+                            id_transaksi: result[0].id,
+                            id_paket: req.body.id_paket,
+                            qty: req.body.qty,
+                            jenis: req.body.jenis
+                        }
+                    let sql_detail = "insert into detil_transaksi set ?";
+                    db.query(sql_detail, detil_transaksi, (err,result) => {
+                        if(err){
+                            throw err;
+                        }else{
+                            res.json({
+                                message: "Success add transaction data."
+                            })
+                        }
                     })
-                    }
-          },
-        //   put: (req, res) => {
-        //             const id = req.params.id
-        //             let penduduk = {
-        //                 name: req.body.nama,
-        //                 address: req.body.alamat,
-        //                 nik: req.body.nik
-        //             }
-        //             db.query(`update data_penduduk set ? where id = '${id}'`, penduduk, (err, results) => {
-        //                 let response = null
-        //                 if (err) {
-        //                     response = {
-        //                         message: err.message
-        //                     }
-        //                 } else {
-        //                     res.send({
-        //                         message: "Berhasil Update Data",
-        //                         data: results
-        //                     })
-        //                 }
-        //             })
-        //         }
+                    }   
+                })
+            }
+        })
+    },
 
-
-          put: (req, res) => {
-                    let id = req.body.id;
-                    // let id = req.params.id;
-
-                    let data_new = {
-                              name: req.body.name,
-                              address: req.body.address,
-                              nik: req.body.nik,
-                    }
-                    let data_old;
-
-                    if(id){
-                              let sql = "SELECT name, address, nik FROM data_penduduk WHERE id = ?";
-                              db.query(sql, [id], (err, result) => {
-                                        if (err) {
-                                                  throw err;
-                                        }else{
-                                                  data_old = result;
-                                        }
-                              })
-
-                    }
-                    setTimeout(update, 1);
-                    function update(){
-                              if(data_old){
-                                        let sql = "UPDATE data_penduduk SET ? WHERE id = ?";
-                                        db.query(sql, [data_new, id], (err, result) => {
-                                                  if (err) {
-                                                            throw err
-                                                  }else{
-                                                            res.json({
-                                                                      message: `success update data, ID = ${id}.`,
-                                                                      data_old: data_old[0],
-                                                                      data_new: data_new
-                                                            })
-                                                  }
-                                        })
-                              }
-                    }
-          }       
-      
+   
+    delete: (req,res) => {
+        let id_outlet = req.body.id_outlet;
+        let sql = "delete from outlet where id_outlet = ?";
+        db.query(sql,id_outlet, (err,result) => {
+            if(err){
+                throw err;
+            }else{
+                res.json({
+                    message: `Successfully delete outlet where id = ${id_outlet}.`
+                })
+            }
+        })        
+    },
+    update: (req,res) => {
+        let id_outlet = req.body.id_outlet;
+        let data = {
+            nama_outlet: req.body.nama_outlet,
+            alamat_outlet: req.body.alamat_outlet,
+            telp_outlet: req.body.telp_outlet
+        }
+        let sql = "update outlet set ? where id_outlet = ?";
+        db.query(sql,[data, id_outlet], (err,result) => {
+            if(err){
+                throw err;
+            }else{
+                res.json({
+                    message: `Successfully update outlet where id = ${id_outlet}.`,
+                    data
+                })
+            }
+        })        
+    }
 }
+
+ //     let data2 = {
+    //         id_transaksi: transaksi.id_transaksi,
+    //         id_paket: req.body.id_paket,
+    //         qty: req.body.qty,
+    //         total_harga: req.body.total_harga,
+    //         keterangan: req.body.keterangan
+    //     }
+    //     let sql1 = "INSERT INTO transaksi SET ?";
+    //     db.query(sql1,data1, (err,result) => {
+    //         if(err){
+    //             throw err;
+    //         }else{
+    //             transaksi = result;
+    //         }
+    //     })
+    //     setTimeout(() => {
+    //         let sql2 = "INSERT INTO detail_transaksi SET ?";
+    //         db.query(sql2,data2, (err,result) => {
+    //             if(err){
+    //                 throw err;
+    //             }else{
+    //                 res.json({
+    //                     message: "Data has been added.",
+    //                     data: transaksi + result
+    //                 })
+    //             }
+    //         })
+    //     }, 1000);
+    // },

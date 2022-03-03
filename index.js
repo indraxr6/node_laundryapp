@@ -22,13 +22,13 @@ app.get('/', (req, res) => {
           })
 })
 
-// app.use ("/member", require('./routes/member.router'));
+
 app.use ("/user", require('./routes/user.router'));
-// app.use ("/member", require('./routes/member.router'));
-// app.use ("/outlet", require('./routes/outlet.router'));
+app.use ("/member", require('./routes/member.router'));
+app.use ("/outlet", require('./routes/outlet.router'));
 // app.use ("/paket", require('./routes/paket.router'));
-// app.use ("/transaksi", require('./routes/transaksi.router'));
-// app.use ("/detil_transaksi", require('./routes/detil_laundry.router'));
+app.use ("/transaksi", require('./routes/transaksi.router'));
+
 
 app.use ("/login", require('./routes/authentication.router'));
 
