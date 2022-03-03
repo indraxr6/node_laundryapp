@@ -6,13 +6,10 @@ const controller = require('../controllers/transaksi.controller');
 
 router.get("/detail/", controller.getData);
 router.get("/detail/:id", controller.getDetails);
-
-
-// router.get("/:id", controller.selectData);
-
-
 router.post("/add", controller.add);
 router.delete("/delete/:id", controller.delete);
-router.put("/update/:id", controller.update);
+// router.put("/update/:id", controller.update);
+router.put("/confirm/:id", controller.confirm);
+
 
 module.exports = router;

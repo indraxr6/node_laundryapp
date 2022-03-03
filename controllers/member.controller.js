@@ -77,9 +77,8 @@ module.exports = {
             alamat: req.body.alamat,
             jenis_kelamin: req.body.jenis_kelamin,
             tlp: req.body.tlp,
-          
         }
-        let sql = "update membe set ? where id = ?";
+        let sql = "update member set ? where id = ?";
         db.query(sql,[data, id], (err,result) => {
             if(err){
                 throw err;
